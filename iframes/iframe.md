@@ -8,7 +8,7 @@
 * 同域：子页面和父页面的地址同域（协议端口域名均相同）
 * 跨域：子页面和父页面的地址跨域
 * ！！！跨域的父子页面不能进行获取元素的操作，只能有显示的操作
-* demo必须使用http协议，本地服务好像有毛病，原因未研究
+* [查看示例demo](https://frontzhm.github.io/web-demo/iframe)，[demo地址]()
 
 ## 简单使用和属性介绍
 
@@ -31,6 +31,8 @@
 `window.frames`可以获取页面所有的iframe元素。
 获取iframe的的window：
   * `window.frames.iframeName`，主要这里的iframeName是iframe的name属性值。这时候就可以用window的一系列属性了。
+  * 或者，`document.getElementById("frameid").contentWindow`
+  * 这里特别注意，必须等iframe页面都加载完了才能获取iframe里面的元素
 
 ```html
 <!-- index.html -->

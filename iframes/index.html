@@ -30,6 +30,14 @@
       var idoc = iwindow.document;
       // iframe.html里面的body
       var ibody = idoc.body;
+      console.log(22);
+      iwindow.onload = function() {
+        alert("框架加载完毕.");
+        // iframe.html里面的元素
+        var iele = idoc.querySelector("a");
+        console.log(iele);
+      };
+
       // iframe.html里面的元素
       var iele = idoc.querySelector("a");
       console.log(iwindow_alias, iwindow, idoc, ibody, iele);
@@ -43,7 +51,13 @@
       var baidu_body = idoc.body;
       // iframe.html里面的元素
       var baidu_ele = idoc.querySelector("a");
-      console.log(baidu_window_alias, baidu_window, baidu_doc, baidu_body, baidu_ele);
+      console.log(
+        baidu_window_alias,
+        baidu_window,
+        baidu_doc,
+        baidu_body,
+        baidu_ele
+      );
     </script>
   </body>
 </html>
