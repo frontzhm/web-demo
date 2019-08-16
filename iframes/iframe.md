@@ -14,7 +14,7 @@
 * 同域：子页面和父页面的地址同域（协议端口域名均相同）
 * 跨域：子页面和父页面的地址跨域
 * ！！！跨域的父子页面不能进行获取元素的操作，只能有显示的操作
-* [查看示例demo](https://frontzhm.github.io/web-demo/iframe)，[demo地址]()
+* [查看示例demo](https://frontzhm.github.io/web-demo/iframes)，[demo地址](https://github.com/frontzhm/web-demo/tree/master/iframes)
 
 ## 简单使用和属性介绍
 

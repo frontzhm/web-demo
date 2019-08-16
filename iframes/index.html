@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>iframe</title>
   </head>
   <body>
     <a href="">我就是父页面的</a>
@@ -15,13 +15,13 @@
       frameborder="0"
       scrolling="auto"
     ></iframe>
-    <iframe
+    <!-- <iframe
       src="https://www.baidu.com/"
       name="baidu"
       id="baidu"
       frameborder="0"
       scrolling="auto"
-    ></iframe>
+    ></iframe> -->
     <script>
       // iframe.html里面的window
       var iwindow_alias = document.getElementById("testid");
@@ -40,8 +40,8 @@
       console.log(iwindow_alias, iwindow);
 
       // iframe.html里面的window
-      var baidu_window_alias = document.getElementById("baidu");
-      var baidu_window = window.frames.baidu;
+      // var baidu_window_alias = document.getElementById("baidu");
+      // var baidu_window = window.frames.baidu;
  
     </script>
   </body>
