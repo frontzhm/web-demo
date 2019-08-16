@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <a href="">我就是父页面的</a>
+    <iframe
+      src="./iframe.html"
+      name="test"
+      id="testid"
+      frameborder="0"
+      scrolling="auto"
+    ></iframe>
+    <iframe
+      src="https://www.baidu.com/"
+      name="baidu"
+      id="baidu"
+      frameborder="0"
+      scrolling="auto"
+    ></iframe>
+    <script>
+      // iframe.html里面的window
+      var iwindow_alias = document.getElementById("testid");
+      var iwindow = window.frames.test;
+      // 获取iframe的元素就需要在iframe加载后
+      iwindow.onload = function() {
+        // iframe.html里面的document
+        var idoc = iwindow.document;
+        // iframe.html里面的body
+        var ibody = idoc.body;
+        // iframe.html里面的元素
+        var iele = iwindow.document.querySelector("a");
+        console.log(idoc, ibody, iele);
+      };
+
+      console.log(iwindow_alias, iwindow);
+
+      // iframe.html里面的window
+      var baidu_window_alias = document.getElementById("baidu");
+      var baidu_window = window.frames.baidu;
+ 
+    </script>
+  </body>
+</html>
