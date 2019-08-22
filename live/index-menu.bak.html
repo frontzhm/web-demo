@@ -233,11 +233,13 @@
     const ADD_ID = "fel1unowyw";
     const ADD_SECRET = "8e22d3a7471d4e0e8ddaecef69b74079";
     const AjaxMenuList = ({channelId}) => {
-      let params = getNewParams({ channelId: 365118 }, ADD_ID, ADD_SECRET)
-      return axios.get("http://api.polyv.net/live/v3/channel/menu/list", {params})
-    }
+      return axios.get("http://api.polyv.net/live/v3/channel/menu/list", {
+      params: getNewParams({ channelId: 365118 }, ADD_ID, ADD_SECRET)
+    })
     const AjaxMenuUpdate = ({menuId,content}) => {
-      return axios.post("http://api.polyv.net/live/v3/channel/menu/update", { menuId,content })
+      return axios.post("http://api.polyv.net/live/v3/channel/menu/update", {
+        menuId,content
+      })
     }
     let vm = new Vue({
       el: "#app",
@@ -395,7 +397,7 @@
             label: "操作"
           }
         ],
-
+        
       },
       computed:{
         // {"menuId":"8907d8f6ee","menuType":"desc","name":"直播介绍","ordered":1,"content":"<p>法庭GV和</p>"}
