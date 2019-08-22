@@ -73,6 +73,10 @@
       .el-table::before {
         height: 0px !important;
       }
+      .el-dialog{
+        width: 400px;
+      }
+
       /* element.css 修改结束 */
       .main {
         width: 640px;
@@ -116,7 +120,7 @@
             @tab-click="handleClick"
           >
             <el-tab-pane
-              v-for="item in menuTableData"
+              v-for="item in menuTableDataNative"
               :key="item.menuId"
               v-if="item.menuType==='chat' || item.menuType==='quiz'"
               :label="item.name"
@@ -171,6 +175,7 @@
                     autocomplete="off"
                     maxlength="8"
                     show-word-limit
+                    @input="inputUpdateName(scope.row.menuId)"
                   ></el-input>
                 </el-table-column>
                 <!-- <el-table-column prop="menuType" label="菜单类型" width="150">
@@ -232,85 +237,140 @@
     };
     const ADD_ID = "fel1unowyw";
     const ADD_SECRET = "8e22d3a7471d4e0e8ddaecef69b74079";
-    const AjaxMenuList = ({channelId}) => {
-      let params = getNewParams({ channelId: 365118 }, ADD_ID, ADD_SECRET)
-      return axios.get("http://api.polyv.net/live/v3/channel/menu/list", {params})
-    }
-    const AjaxMenuUpdate = ({menuId,content}) => {
-      return axios.post("http://api.polyv.net/live/v3/channel/menu/update", { menuId,content })
-    }
+    const AjaxMenuList = ({ channelId }) => {
+      let params = getNewParams({ channelId }, ADD_ID, ADD_SECRET);
+      return axios.get("http://api.polyv.net/live/v3/channel/menu/list", {
+        params
+      });
+    };
+    const AjaxMenuUpdate = ({ menuId, content }) => {
+      return axios.post("http://api.polyv.net/live/v3/channel/menu/update", {
+        menuId,
+        content
+      });
+    };
+    const AjaxMenuAdd = ({
+      channelId,
+      name,
+      content,
+      type = "text"
+    }) => {
+      return axios.post("http://api.polyv.net/live/v3/channel/menu/add", {
+        channelId,
+        name,
+        content,
+        type
+      });
+    };
+    const AjaxMenuDelete = ({
+      menuIds
+    }) => {
+      return axios.post("http://api.polyv.net/live/v3/channel/menu/delete", {
+        menuIds
+      });
+    };
     let vm = new Vue({
       el: "#app",
       mounted() {
         this.init();
       },
       methods: {
-        ajaxMenuList(){
-          AjaxMenuList({channelId:365118}).then(res=>{
-            res = res.data
-            if(!res.status === 'sucess'){
-              this.$message.error(res.message)
-              return
+        ajaxMenuList() {
+          AjaxMenuList({ channelId: this.channelId }).then(res => {
+            res = res.data;
+            if (!res.status === "sucess") {
+              this.$message.error(res.message);
+              return;
             }
-            resData = res.data
-            this.menuTableDataNative = resData
-            this.createEditor()
-            console.log(JSON.stringify(resData[0]))
-          })
+            resData = res.data;
+            this.menuTableDataNative = resData;
+            this.createEditor();
+            console.log(JSON.stringify(resData[0]));
+          });
         },
         init() {
           console.log(2);
-          this.ajaxMenuList()
+          this.ajaxMenuList();
 
           // 这里先请求拿到菜单的接口
         },
+        inputUpdateName(menuId){
+          let menu = this.menuTableData.find(menu => menu.menuId === menuId)
+          menu.updateName = menu.name
+        },
         clickSaveContent(menuId) {
-
-          let content = this.$refs[`editor${menuId}`].txt.html()
-          AjaxMenuUpdate({menuId,content})
-          .then(res=>{
-            res = res.data
-            if(!res.status === 'sucess'){
-              this.$message.error(res.message)
-              return
+          console.log(this.$refs[`editor${menuId}`]);
+          // let content = this.$refs[`editor${menuId}`].innerHTML
+          let content = 12;
+          AjaxMenuUpdate({ menuId, content }).then(res => {
+            res = res.data;
+            if (!res.status === "sucess") {
+              this.$message.error(res.message);
+              return;
             }
             // 成功的话更新现有的content
-            let menu = this.menuTableDataNative.find(menu=>menu.menuId === menuId)
-            menu.content = content
-          })
+            let menu = this.menuTableDataNative.find(
+              menu => menu.menuId === menuId
+            );
+            menu.content = content;
+          });
         },
+        // 这是点击显示弹出框
         clickManageMenu() {
           this.showManageMenu = true;
         },
+        // 这是点击显示弹出框
         clickAddMenu() {
           this.showAddMenu = true;
         },
+        // 这是点击添加的功能
         clickBtnAddMenu() {
-          this.showAddMenu = false;
-          // TODO 请求添加菜单的接口
-          this.tabs.push({
-            label: this.addMenuForm.name,
-            name: this.addMenuForm.name
-          });
-          // 重新初始化这个tab下的编辑器
-          this.createSingleEditor(this.addMenuForm.name);
+          AjaxMenuAdd({ channelId:this.channelId,name: this.addMenuForm.name, content: "" }).then(
+            res => {
+              res = res.data;
+              if (!res.status === "sucess") {
+                this.$message.error(res.message);
+                return;
+              }
+              // 成功的话增加现有的menu
+              this.menuTableDataNative.push(res.data);
+              this.showAddMenu = false;
+              // 重新初始化这个tab下的编辑器
+              this.createSingleEditor(res.data.menuId);
+            }
+          );
         },
         clickDeleteMenu(menuId) {
           console.log(menuId);
+          let menu = this.menuTableData.find(menu=>menu.menuId === menuId)
+          menu.isDelete = true
+        
+          this.menuTableData.forEach((menu,index)=>{
+            if(menu.menuId === menuId){
+              this.menuTableData.splice(index,1)
+              return
+            }
+          })
         },
         clickBtnSaveManage() {
           this.showManageMenu = false;
+          // 请求很多接口 成功之后 this.menuTableDataNative赋值
+          // 请求修改 名字的接口
+          // 请求删除 的接口
+          // 根据 menuTableData的 isDelete判断删除，根据updateName判断修改名字
+          console.log(this.menuTableData)
+          this.menuTableDataNative = this.menuTableData
         },
         createEditor() {
-          this.menuTableData.forEach(menu => {
-            if(menu.name==='互动聊天' || menu.name==='提问'){
-              return
+          this.menuTableDataNative.forEach(menu => {
+            if (menu.name === "互动聊天" || menu.name === "提问") {
+              return;
             }
-            this.createSingleEditor(`editor${menu.menuId}`,menu.content);
+            this.createSingleEditor(`editor${menu.menuId}`, menu.content);
           });
         },
         // editorname和tab的label是一样的
-        createSingleEditor(editorName,innerHTML) {
+        createSingleEditor(editorName, innerHTML='') {
           // menuId为辨别，前缀加上editor
           // 自定义菜单配置
           const menus = [
@@ -346,14 +406,14 @@
 
           Vue.nextTick(() => {
             let E = window.wangEditor;
-            console.log(editorName)
+            console.log(editorName);
             let editor = new E(this.$refs[editorName]);
-            console.log(this.$refs[editorName])
+            console.log(this.$refs[editorName]);
             editor.customConfig.menus = menus;
             editor.customConfig.colors = colors;
             // console.log(editor.$toolbarElem[0])
             editor.create();
-            editor.cmd.do('insertHTML', innerHTML)
+            editor.cmd.do("insertHTML", innerHTML);
             const setIndex = domClass => {
               let doms = document.querySelectorAll(domClass);
               doms = [...doms];
@@ -369,14 +429,24 @@
       },
 
       data: {
-        menuTableDataNative:[{"menuId":"8907d8f6ee","menuType":"desc","name":"直播介绍","ordered":1,"content":"<p>法庭GV和</p>"}],
+        channelId:365118,
+        menuTableDataNative: [
+          {
+            menuId: "8907d8f6ee",
+            menuType: "desc",
+            name: "直播介绍",
+            ordered: 1,
+            content: "<p>法庭GV和</p>"
+          }
+        ],
+        menuTableData:[],
         showAddMenu: false,
         addMenuForm: {
           name: "",
           type: "text"
         },
         formLabelWidth: "5em",
-        showManageMenu: true,
+        showManageMenu: false,
         menuTableKeys: [
           {
             prop: "name",
@@ -394,22 +464,32 @@
             prop: "action",
             label: "操作"
           }
-        ],
-
+        ]
       },
-      computed:{
+      watch:{
+        menuTableDataNative(newValue){
+          let menuTableData = JSON.parse(JSON.stringify(newValue))
+          // menuTableData = menuTableData.map(menu => {
+          //   menu.nameEditing = menu.name;
+          //   menu.contentEditing = menu.content;
+          //   return menu;
+          // });
+          this.menuTableData = menuTableData
+        }
+      },
+      computed: {
         // {"menuId":"8907d8f6ee","menuType":"desc","name":"直播介绍","ordered":1,"content":"<p>法庭GV和</p>"}
-        menuTableData(){
-          let res = this.menuTableDataNative.map(menu=>{
-            menu.nameEditing = menu.name
-            menu.contentEditing = menu.content
-            return menu
-          })
-          return res
-        },
+        // menuTableDataNative() {
+        //   let res = this.menuTableDataNativeNative.map(menu => {
+        //     menu.nameEditing = menu.name;
+        //     menu.contentEditing = menu.content;
+        //     return menu;
+        //   });
+        //   return res;
+        // },
         // orderd大小来 这边偷懒取第一个了
-        tabActiveName(){
-          return this.menuTableData[0].menuId;
+        tabActiveName() {
+          return this.menuTableDataNative[0].menuId;
         }
       }
     });
