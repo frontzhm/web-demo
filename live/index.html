@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- import CSS -->
+    <link rel="stylesheet" href="./element.css" />
+    <style>
+      /* -------- reset start -------- */
+
+      body,
+      ul,
+      ol,
+      p,
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        padding: 0;
+      }
+      ol,
+      ul {
+        list-style: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: normal;
+      }
+      img {
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
+      #app {
+        font-family: "Avenir", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* text-align: center; */
+        color: #333;
+        font-size: 14px;
+      }
+
+      /* -------- reset end -------- */
+      .b {
+        font-weight: bold;
+      }
+      .form-item {
+        margin-top: 13px;
+        display: flex;
+        align-items: baseline;
+      }
+      .form-item-label {
+        width: 10em;
+        text-align: right;
+        display: inline-block;
+      }
+      .form-item-content {
+        margin-left: 20px;
+      }
+      .preview-box {
+        margin-top: 10px;
+      }
+      .previewDom {
+        max-width: 500px;
+      }
+      .btn-wrap {
+        margin-top: 50px;
+        text-align: center;
+      }
+      .el-upload__tip {
+        display: inline-block;
+        margin-left: 15px;
+      }
+      .el-upload-list {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="editor" style="display: none;"></div>
+    <div id="app">
+      <section class="form-wrap">
+        <!-- 暖场开关的开始 -->
+
+        <div class="form-item">
+          <label class="form-item-label" for="">暖场开关：</label>
+          <div class="form-item-content">
+            <el-switch
+              v-model="isOpenWarmup"
+              active-color="#13ce66"
+              inactive-color="#ccc"
+            >
+            </el-switch>
+            <span v-if="isOpenWarmup" class="el-upload__tip">
+              关闭后，直播观看页将不显示暖场内容
+              当播放回放视频时将不显示暖场内容
+            </span>
+            <span v-else class="el-upload__tip">
+              开启后，则观看页显示暖场内容
+            </span>
+          </div>
+        </div>
+        <!-- 暖场开关的结束 -->
+        <!-- 暖场其他设置开始 -->
+        <div v-show="isOpenWarmup">
+          <div class="form-item">
+            <label class="form-item-label" for="">暖场类型：</label>
+            <div class="form-item-content">
+              <el-radio v-model="warmupType" label="warmVideo">视频</el-radio>
+              <el-radio v-model="warmupType" label="warmImage">图片</el-radio>
+            </div>
+          </div>
+          <!-- 视频设置 -->
+          <template v-if="warmupType==='warmVideo'">
+            <div class="form-item">
+              <label class="form-item-label" for="">暖场视频：</label>
+              <div class="form-item-content">
+                <el-upload
+                  accept=".avi,.f4v,.mpg,.mp4,.flv,.wmv,.mov,.3gp,.rmvb,.mkv,.asf,.264,.ts,.mts,.dat,.vob,.mp3,.wav,.m4v,.webm,.mod"
+                  class="upload-demo"
+                  ref="upload"
+                  action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview"
+                  :on-remove="handleRemove"
+                  :auto-upload="false"
+                  :file-list="fileList"
+                  :on-change="handleVideoChange"
+                >
+                  <el-button
+                    slot="trigger"
+                    size="small"
+                    type="primary"
+                    :disabled="hasUploadedVideo"
+                    >上传本地视频</el-button
+                  >
+                  <div slot="tip" class="el-upload__tip">
+                    请上传小于 50M 的视频
+                  </div>
+                </el-upload>
+                <div class="preview-box" v-if="previewVideoUrl">
+                  <!-- http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 -->
+                  <video
+                    class="previewDom"
+                    ref="previewVideoDom"
+                    :src="previewVideoUrl"
+                    autoplay
+                    controls
+                  ></video>
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 图片设置开始 -->
+          <template v-if="warmupType==='warmImage'">
+            <div class="form-item">
+              <label class="form-item-label" for="">暖场图片：</label>
+              <div class="form-item-content">
+                <el-upload
+                  accept="image/jpeg,image/jpg,image/png,image/gif"
+                  class="upload-demo"
+                  ref="upload"
+                  action="https://jsonplaceholder.typicode.com/posts/"
+                  :on-preview="handlePreview"
+                  :on-remove="handleRemove"
+                  :auto-upload="false"
+                  :file-list="fileList"
+                  :on-change="handleImgChange"
+                >
+                  <el-button
+                    slot="trigger"
+                    size="small"
+                    :disabled="hasUploadedImage"
+                    type="primary"
+                    >上传图片</el-button
+                  >
+                  <div slot="tip" class="el-upload__tip">
+                    图片建议尺寸为：1280 x 720，图片大小不超过 2M，支持
+                    jpg、jpeg、png、gif 格式
+                  </div>
+                </el-upload>
+                <div class="preview-box" v-if="previewImgUrl">
+                  <img
+                    class="previewDom"
+                    ref="previewImgDom"
+                    :src="previewImgUrl"
+                    alt=""
+                  />
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 图片设置结束 -->
+        </div>
+        <!-- 暖场其他设置结束 -->
+        <div class="btn-wrap" v-if="isOpenWarmup">
+          <el-button type="primary" @click="clickSave">确认保存</el-button>
+        </div>
+      </section>
+    </div>
+  </body>
+  <!-- import Vue before Element -->
+  <script src="./vue.min.js"></script>
+  <!-- import JavaScript -->
+  <script src="./element.js"></script>
+  <script src="./wangEditor.min.js"></script>
+
+  <script>
+    /**
+     * TODO  没判断类型和大小
+     * 
+     * */
+    // 富文本编辑器
+    var E = window.wangEditor;
+    var editor = new E("#editor");
+    // 或者 var editor = new E( document.getElementById('editor') )
+
+    // 自定义菜单配置
+    editor.customConfig.menus = [
+      "head", // 标题
+      "bold", // 粗体
+      "fontSize", // 字号
+      "fontName", // 字体
+      "italic", // 斜体
+      "underline", // 下划线
+      "foreColor", // 文字颜色
+      "backColor", // 背景颜色
+      "link", // 插入链接
+      "list", // 列表
+      "justify", // 对齐方式
+      "quote", // 引用
+      "image", // 插入图片
+      "undo", // 撤销
+      "redo" // 重复
+    ];
+    // 自定义配置颜色
+    editor.customConfig.colors = [
+      "#000000",
+      "#eeece0",
+      "#1c487f",
+      "#4d80bf",
+      "#c24f4a",
+      "#8baa4a",
+      "#7b5ba1",
+      "#46acc8",
+      "#f9963b",
+      "#ffffff"
+    ];
+    editor.create();
+    // vm实例
+
+    let vm = new Vue({
+      el: "#app",
+      data: function() {
+        return {
+          visible: false,
+          isOpenWarmup: true,
+          warmupType: "warmVideo",
+          fileList: [],
+          // 为空的时候就是没有上传图片
+          previewImgUrl: "",
+          previewVideoUrl: "",
+          hasUploadedImage: false,
+          hasUploadedVideo: false
+        };
+      },
+
+      watch: {
+        fileList(newValue) {
+          console.log(newValue);
+          this.previewImgUrl = newValue.raw;
+        }
+      },
+      methods: {
+        init() {
+          // 拿到channelId
+          // 先请求拿到设置
+          // 暖场的开关为关的时候 请求接口。开的话必须保存设置
+        },
+        clickSave() {
+          const isImageType = this.warmupType === "warmImage";
+          const isVideoType = this.warmupType === "warmVideo";
+          if (isImageType && !this.hasUploadedImage) {
+            this.$message({ type: "error", message: "请上传图片" });
+            return;
+          }
+          if (isVideoType && !this.hasUploadedVideo) {
+            this.$message({ type: "error", message: "请上传视频" });
+            return;
+          }
+        },
+        submitUpload() {
+          this.$refs.upload.submit();
+        },
+        handleRemove(file, fileList) {
+          console.log(file, fileList);
+        },
+        handlePreview(file) {
+          console.log(file);
+        },
+        handleImgChange(file) {
+          this.previewImgUrl = window.URL.createObjectURL(file.raw);
+          // 浏览器会在文档退出的时候自动释放它们，但是为了获得最佳性能和内存使用状况，你应该在安全的时机主动释放掉它们。
+          Vue.nextTick(() => {
+            this.$refs.previewImgDom.onload = function() {
+              window.URL.revokeObjectURL(this.previewImgUrl);
+            };
+          });
+        },
+        handleVideoChange(file) {
+          this.previewVideoUrl = window.URL.createObjectURL(file.raw);
+          // 浏览器会在文档退出的时候自动释放它们，但是为了获得最佳性能和内存使用状况，你应该在安全的时机主动释放掉它们。
+          Vue.nextTick(() => {
+            this.$refs.previewVideoDom.onload = function() {
+              window.URL.revokeObjectURL(this.previewVideoUrl);
+            };
+          });
+        }
+      }
+    });
+  </script>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- import CSS -->
+    <link rel="stylesheet" href="./element.css" />
+    <style>
+      /* -------- reset start -------- */
+
+      body,
+      ul,
+      ol,
+      p,
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        padding: 0;
+      }
+      ol,
+      ul {
+        list-style: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: normal;
+      }
+      img {
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
+      #app {
+        font-family: "Avenir", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* text-align: center; */
+        color: #333;
+        font-size: 14px;
+      }
+
+      /* -------- reset end -------- */
+      .b {
+        font-weight: bold;
+      }
+      /* element.css 修改开始 */
+      .el-table th > .cell {
+        text-align: center;
+      }
+      .el-table td > .cell {
+        text-align: center;
+      }
+      .el-table--border {
+        border: none !important;
+      }
+      .el-table th,
+      .el-table td {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        font-weight: normal !important;
+      }
+      .el-table.has-sort th {
+        padding-top: 3px !important;
+        padding-bottom: 3px !important;
+      }
+      .el-table th {
+        color: #666 !important;
+      }
+      .el-table::before {
+        height: 0px !important;
+      }
+      /* element.css 修改结束 */
+      .main {
+        width: 640px;
+      }
+      .setting-desc {
+        margin-top: 40px;
+        text-align: center;
+      }
+      .menu-header {
+        position: relative;
+        /* border-bottom:1px solid #ccc; */
+      }
+      .menu-header-right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin-top: 10px;
+      }
+      .editor-wrap {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .editor {
+        width: 100%;
+      }
+      .btn-wrap {
+        margin-top: 40px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="editor" style="display: none;"></div>
+    <div id="app">
+      <section class="form-wrap main">
+        <header class="menu-header">
+          <el-tabs
+            class="menu-header-left"
+            v-model="tabActiveName"
+            @tab-click="handleClick"
+          >
+            <el-tab-pane
+              v-for="item in tabs"
+              :key="item.label"
+              v-if="item.name==='chat' || item.name==='question'"
+              :label="item.label"
+              :name="item.name"
+            >
+              <div class="setting-desc">
+                当前为{{ item.label }}模块<br />
+                {{ item.label }}模块为系统默认样式
+              </div>
+            </el-tab-pane>
+            <el-tab-pane v-else :label="item.label" :name="item.name">
+              <div class="editor-wrap">
+                <div :ref="item.name" class="editor"></div>
+              </div>
+              <div class="btn-wrap">
+                <el-button type="primary" @click="clickSave"
+                  >确认保存</el-button
+                >
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+          <div class="menu-header-right">
+            <el-link type="primary" @click="clickAddMenu">添加菜单</el-link>
+            <el-link type="primary" @click="clickManageMenu">菜单管理</el-link>
+            <!-- 添加菜单的弹出框 -->
+            <el-dialog title="添加菜单" :visible.sync="showAddMenu">
+              <el-form :model="addMenuForm">
+                <el-form-item label="菜单名称" :label-width="formLabelWidth">
+                  <el-input
+                    v-model="addMenuForm.name"
+                    autocomplete="off"
+                    maxlength="8"
+                    show-word-limit
+                  ></el-input>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="showAddMenu = false">取消</el-button>
+                <el-button type="primary" @click="clickBtnAddMenu"
+                  >确认添加</el-button
+                >
+              </div>
+            </el-dialog>
+            <!-- 菜单管理的弹出框 -->
+            <el-dialog title="菜单管理" :visible.sync="showManageMenu">
+              <el-table :data="menuTableData" stripe>
+                <el-table-column prop="name" label="菜单名称" width="200">
+                  <!-- #default="{row}" -->
+                  <el-input
+                    slot-scope="scope"
+                    v-model="scope.row.name"
+                    autocomplete="off"
+                    maxlength="8"
+                    show-word-limit
+                  ></el-input>
+                </el-table-column>
+                <!-- <el-table-column prop="menuType" label="菜单类型" width="150">
+                  </el-table-column> -->
+                <el-table-column prop="action" label="操作" width="200">
+                  <el-link
+                    type="danger"
+                    slot-scope="scope"
+                    @click="clickDeleteMenu(scope.row.menuId)"
+                    >{{ scope.row.name === "咨询提问" ? "" : "删除" }}</el-link
+                  >
+                </el-table-column>
+              </el-table>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="showManageMenu = false">取消</el-button>
+                <el-button type="primary" @click="clickBtnSaveManage"
+                  >确认添加</el-button
+                >
+              </div>
+            </el-dialog>
+          </div>
+        </header>
+      </section>
+    </div>
+  </body>
+  <!-- import Vue before Element -->
+  <script src="./vue.min.js"></script>
+  <!-- import JavaScript -->
+  <script src="./element.js"></script>
+  <script src="./wangEditor.min.js"></script>
+  <script src="./axios.min.js"></script>
+  <script src="./md5.min.js"></script>
+
+  <script>
+    // 拿到sign
+    const getSign = (params, appSecret) => {
+      let keys = Object.keys(params);
+      // let isHasKey = keys.length !== 0
+      keys.sort();
+      let paramsStr = "";
+      // 累加
+      keys.forEach(key => (paramsStr += `${key}${params[key]}`));
+      // 首尾加上appSecret
+      paramsStr = `${appSecret}${paramsStr}${appSecret}`;
+      // https://github.com/emn178/js-md5
+      // 用的hex方法 然后大写
+      let res = md5.hex(paramsStr).toUpperCase();
+      return res;
+    };
+    // 加上appId timestamp 和sign
+    // appId:fel1unowyw
+    // AppSecret:8e22d3a7471d4e0e8ddaecef69b74079
+    const getNewParams = (params, appId, appSecret) => {
+      const timestamp = new Date() - 0;
+      params = { ...params, appId, timestamp };
+      const sign = getSign(params, appSecret);
+      params.sign = sign;
+      return params;
+    };
+    const ADD_ID = "fel1unowyw";
+    const ADD_SECRET = "8e22d3a7471d4e0e8ddaecef69b74079";
+    const AjaxMenuList = ({channelId}) => {
+      return axios.get("http://api.polyv.net/live/v3/channel/menu/list", {
+      params: getNewParams({ channelId: 365118 }, ADD_ID, ADD_SECRET)
+    })
+    }
+    let vm = new Vue({
+      el: "#app",
+      mounted() {
+        this.init();
+      },
+      methods: {
+        ajaxMenuList(){
+          AjaxMenuList({channelId:365118}).then(res=>{
+            res = res.data
+            if(!res.status === 'sucess'){
+              this.$message.error(res.message)
+              return
+            }
+            resData = res.data
+            this.menuTableDataNative = resData
+            console.log(JSON.stringify(resData[0]))
+          })
+        },
+        init() {
+          console.log(2);
+          this.ajaxMenuList()
+          this.createEditor();
+
+          // 这里先请求拿到菜单的接口
+        },
+        clickSave() {},
+        clickManageMenu() {
+          this.showManageMenu = true;
+        },
+        clickAddMenu() {
+          this.showAddMenu = true;
+        },
+        clickBtnAddMenu() {
+          this.showAddMenu = false;
+          // TODO 请求添加菜单的接口
+          this.tabs.push({
+            label: this.addMenuForm.name,
+            name: this.addMenuForm.name
+          });
+          // 重新初始化这个tab下的编辑器
+          this.createSingleEditor(this.addMenuForm.name);
+        },
+        clickDeleteMenu(menuId) {
+          console.log(menuId);
+        },
+        clickBtnSaveManage() {
+          this.showManageMenu = false;
+        },
+        createEditor() {
+          this.tabs.forEach(tab => {
+            this.createSingleEditor(tab.name);
+          });
+        },
+        // editorname和tab的label是一样的
+        createSingleEditor(editorName) {
+          // 自定义菜单配置
+          const menus = [
+            "head", // 标题
+            "bold", // 粗体
+            "fontSize", // 字号
+            "fontName", // 字体
+            "italic", // 斜体
+            "underline", // 下划线
+            "foreColor", // 文字颜色
+            "backColor", // 背景颜色
+            "link", // 插入链接
+            "list", // 列表
+            "justify", // 对齐方式
+            "quote", // 引用
+            "image", // 插入图片
+            "undo", // 撤销
+            "redo" // 重复
+          ];
+          // 自定义配置颜色
+          const colors = [
+            "#000000",
+            "#eeece0",
+            "#1c487f",
+            "#4d80bf",
+            "#c24f4a",
+            "#8baa4a",
+            "#7b5ba1",
+            "#46acc8",
+            "#f9963b",
+            "#ffffff"
+          ];
+
+          Vue.nextTick(() => {
+            let E = window.wangEditor;
+            let editor = new E(this.$refs[editorName]);
+            editor.customConfig.menus = menus;
+            editor.customConfig.colors = colors;
+            // console.log(editor.$toolbarElem[0])
+            editor.create();
+            const setIndex = domClass => {
+              let doms = document.querySelectorAll(domClass);
+              doms = [...doms];
+              doms.forEach(dom => (dom.style.zIndex = 1));
+            };
+            setIndex(".w-e-text-container");
+            setIndex(".w-e-menu");
+          });
+        },
+        handleClick(tab, event) {
+          console.log(tab, event);
+        }
+      },
+
+      data: {
+        menuTableDataNative:[{"menuId":"8907d8f6ee","menuType":"desc","name":"直播介绍","ordered":1,"content":"<p>法庭GV和</p>"}],
+        tabActiveName: "liveIntroduction",
+        tabs: [
+          { label: "直播介绍", name: "liveIntroduction" },
+          { label: "互动聊天", name: "chat" },
+          { label: "提问", name: "question" },
+          { label: "新的", name: "new" }
+        ],
+        showAddMenu: false,
+        addMenuForm: {
+          name: "",
+          type: "text"
+        },
+        formLabelWidth: "5em",
+        showManageMenu: true,
+        menuTableKeys: [
+          {
+            prop: "name",
+            label: "菜单名称"
+          },
+          // {
+          //   prop:'menuType',
+          //   label:'菜单类型',
+          // },
+          // {
+          //   prop:'ordered',
+          //   label:'菜单顺序',
+          // },
+          {
+            prop: "action",
+            label: "操作"
+          }
+        ],
+        menuTableData: [
+          {
+            menuId: "521e4f5847",
+            menuType: "desc",
+            name: "直播介绍",
+            ordered: 1,
+            content: ""
+          },
+          {
+            menuId: "1b01bc166b",
+            menuType: "chat",
+            name: "互动聊天",
+            ordered: 2,
+            content: ""
+          },
+          {
+            menuId: "41d186c2ab",
+            menuType: "quiz",
+            name: "咨询提问",
+            ordered: 3,
+            content: ""
+          },
+          {
+            menuId: "c2f9e7d8f4",
+            menuType: "iframe",
+            name: "test",
+            ordered: 4,
+            content: null
+          },
+          {
+            menuId: "df8a32aaf7",
+            menuType: "text",
+            name: "1212",
+            ordered: 5,
+            content: "<p><br></p>"
+          }
+        ]
+      },
+      computed:{
+        // {"menuId":"8907d8f6ee","menuType":"desc","name":"直播介绍","ordered":1,"content":"<p>法庭GV和</p>"}
+        menuTableData(){
+          let res = this.menuTableDataNative.map(menu=>{
+            menu.nameEditing = menu.name
+            menu.contentEditing = menu.content
+            return menu
+          })
+          return res
+        }
+      }
+    });
+  </script>
+</html>

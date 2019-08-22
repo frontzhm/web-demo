@@ -83,7 +83,6 @@
     var pele = pdoc.querySelector('a')
   </script>
 ```
-<!-- sh ~/sh/blog.sh  /Users/zhm/mygit/http-demo/iframe/iframe.md -->
 
 > [iframe的使用](https://juejin.im/post/5bdef5ffe51d451a5126086e)
 > [mdn上iframe的使用](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe)

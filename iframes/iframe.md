@@ -1,5 +1,10 @@
-# iframe的运用---特别是获取父子页面的元素
+---
+title: iframe的运用---特别是获取父子页面的元素
+tags: js
+categories: js
+---
 
+# iframe的运用---特别是获取父子页面的元素
 ## TL;DR
 
 * 使用`<iframe src="./iframe.html" frameborder="0" scrolling="auto" name="iframe"></iframe>`
