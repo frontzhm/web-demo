@@ -8,21 +8,30 @@
   </head>
   <body>
     <div id="app">
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tabledata" style="width: 100%">
         <el-table-column prop="date" label="日期" width="180">
         </el-table-column>
         <el-table-column prop="name" label="姓名" width="180">
         </el-table-column>
         <el-table-column prop="address" label="地址">
-          <!-- !!!!! 这里是重点 -->
-          <!-- !!!!! 这里是重点 -->
-          <!-- !!!!! 这里是重点 -->
-          <!-- !!!!! 这里是重点 -->
           <template v-slot="{row, index}">
-            <div>啊 地址 地址 {{ row.address }}</div>
+            <div>el-table里直接v-slot {{ row.address }}</div>
           </template>
         </el-table-column>
       </el-table>
+      <self-table :tabledata="tabledata">
+          <el-table-column  prop="address" label="地址">
+            <!-- 这里的v-slot不能加名字，如果想拿row的话，只能是默认的。因为这是element 的el-table-column，就相当于你自己写的插件，你定义的slot就是default-->
+            <template v-slot="{row, index}">
+              <div>只是table封装成组件 {{ row.address }}</div>
+            </template>
+          </el-table-column>
+      </self-table>
+      <self-table :tabledata="tabledata">
+        <template slot="address">
+          <self-column></self-column>
+        </template>
+      </self-table>
     </div>
     <script src="https://unpkg.com/vue@2.6.10/dist/vue.js"></script>
     <!-- 引入样式 -->
@@ -33,11 +42,36 @@
     <!-- 引入element组件库 -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script>
+      Vue.component("self-table", {
+        props: ["tabledata"],
+        template: `
+        <el-table :data="tabledata" style="width: 100%">
+          <el-table-column prop="date" label="日期" width="180">
+          </el-table-column>
+          <el-table-column prop="name" label="姓名" width="180">
+          </el-table-column>
+          <slot></slot>
+          <slot name="address"></slot>
+        </el-table>
+        
+        `
+      });
+      Vue.component("self-column", {
+        template: `
+        <el-table-column prop="address" label="地址">
+          // 这里的v-slot也只能默认的，如果想拿row的话
+          <template v-slot="{row, index}">
+            <div>table和column都封装成组件了 {{ row.address }}</div>
+          </template>
+        </el-table-column>
+        
+        `
+      });
       var vm = new Vue({
         el: "#app",
         data: {
           el: "22",
-          tableData: [
+          tabledata: [
             {
               date: "2016-05-02",
               name: "王小虎",
