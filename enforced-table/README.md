@@ -1,28 +1,18 @@
 # enforced-table
 
-## Project setup
+## 先安装依赖
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### 本地启动
 ```
 yarn run serve
 ```
 
-### Compiles and minifies for production
+### 打包
 ```
 yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
 ```
 
 ### Customize configuration
