@@ -1,7 +1,9 @@
 <template lang="pug">
   enforced-table(:tableData="tableData" :col-configs="colConfigs")
-    el-table-column(slot="options" label="操作")
-      el-button(size="mini" slot-scope="{ row }") 查看{{row.date}}
+    template(#options)
+      el-table-column( label="操作")
+        template(v-slot="{row}")
+          el-button(size="mini") 查看{{row.date}}
 
 </template>
 
