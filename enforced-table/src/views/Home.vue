@@ -1,28 +1,8 @@
-<template>
-  <div class="home">
-     <enforced-table :tableData="tableData" :col-configs="colConfigs">
-      <el-table-column slot="options" label="操作">
-        <el-button size="mini" slot-scope="{ row }">查看{{row.date}}</el-button>
-      </el-table-column>
-    </enforced-table>
-      <!-- <enforced-table :tableData="tableData" :col-configs="colConfigs">
-        <el-table-column slot="options" label="操作">
-          <el-button size="mini" slot-scope="{ row }">查看{{row.date}}</el-button>
-        </el-table-column>
-    </enforced-table> -->
-     <!-- <enforced-table  :tableData="tableData" :col-configs="colConfigs"> -->
-       <!-- <template name="options">
-        <el-table-column label="操作">
-          <el-button size="mini" slot-scope="{ row }">查看{{row.date}}</el-button>
-        </el-table-column>
+<template lang="pug">
+  enforced-table(:tableData="tableData" :col-configs="colConfigs")
+    el-table-column(slot="options" label="操作")
+      el-button(size="mini" slot-scope="{ row }") 查看{{row.date}}
 
-       </template> -->
-      <!-- <el-table-column slot="options" label="操作"> -->
-        <!-- 111 -->
-        <!-- <el-button size="mini" slot-scope="{ row }">查看{{row.date}}</el-button> -->
-      <!-- </el-table-column> -->
-    <!-- </enforced-table> -->
-  </div>
 </template>
 
 <script>
