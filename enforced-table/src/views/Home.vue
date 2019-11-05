@@ -1,7 +1,7 @@
 <template lang="pug">
-  enforced-table(:tableData="tableData" :col-configs="colConfigs")
+  enhanced-table(:tableData="tableData" :col-configs="colConfigs")
     template(#options)
-      el-table-column( label="操作")
+      el-table-column(label="操作")
         template(v-slot="{row}")
           el-button(size="mini") 查看{{row.date}}
 
@@ -9,12 +9,12 @@
 
 <script>
 // @ is an alias to /src
-import EnforcedTable from '@/components/EnforcedTable.vue'
+import EnhancedTable from '@/components/EnhancedTable.vue'
 
 export default {
   name: 'home',
   components: {
-    EnforcedTable
+    EnhancedTable
   },
   data () {
     return {
