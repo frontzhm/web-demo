@@ -2,7 +2,7 @@
 el-table(:data="tableData" v-loading="isLoad" stripe v-bind="tableConfig" @sort-change="changeSort" @selection-change="changeSelectRows")
   template(v-for="colConfig in colConfigs")
     //- 循环每一项 有slot的单独渲染
-    slot(v-if="colConfig.slot" :name="colConfig.slot")
+    slot(v-if="colConfig.slot" :name="colConfig.slot" :col-config="colConfig")
     //- 有component的单独渲染
     component(v-else-if="colConfig.component" :is="colConfig.component" :col-config="colConfig")
     el-table-column(v-else v-bind="colConfig")

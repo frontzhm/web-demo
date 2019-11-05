@@ -1,7 +1,7 @@
 <template lang="pug">
   enhanced-table(:tableData="tableData" :col-configs="colConfigs")
-    template(#options)
-      el-table-column(label="操作")
+    template(v-slot:options="{colConfig}")
+      el-table-column(v-bind="colConfig")
         template(v-slot="{row}")
           el-button(size="mini") 查看{{row.date}}
 
@@ -24,7 +24,7 @@ export default {
         { prop: 'address', label: '地址' },
         // { prop: 'change', label: '变化', component: PrefixPlusText },
         { prop: 'trend', label: '趋势' },
-        { slot: 'options', message: 'message' }
+        { slot: 'options', label: '操作哇', message: 'message' }
       ],
       tableData: [{
         id: '1',
