@@ -205,6 +205,16 @@ ln -s pwd的路径/bin/node /usr/local/bin/node
 ln -s ~/package/node-v10.15.3-linux-x64/bin/npm /usr/local/bin/npm
 ln -s pwd的路径/bin/npx /usr/local/bin/npx
 
+# 安装git
+sudo apt-get install git
+# 生成公私钥
+ssh-keygen
+# 手动复制下
+less ~/.ssh/id_rsa.pub
+# 去github上 settings - deploy keys 增加之后
+# 项目拿过来
+git clone git@github.com:frontzhm/web-demo.git
+
 ```
 
 ```js
@@ -213,7 +223,7 @@ let express = require('express')
 let bodyParser = require('body-parser')
 let app = express()
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
 // 设置跨域
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
@@ -225,3 +235,5 @@ app.use((req, res, next) => {
 app.listen(3333,()=>{console.log('端口3333已启动')})
 app.get('/',(req,res)=>{res.json({ok:1})})
 ```
+
+

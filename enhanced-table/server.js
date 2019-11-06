@@ -13,4 +13,6 @@ app.use((req, res, next) => {
   req.method === 'OPTIONS' ? res.sendStatus(200) : next()
 })
 app.listen(3333, () => { console.log('端口3333已启动') })
-app.get('/', (req, res) => { res.json({ ok: 1 }) })
+const path = require('path')
+app.use(express.static('./dist'))
+app.get('/', (req, res) => { res.sendFile(path.resolve('dist/index.html')) })
