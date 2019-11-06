@@ -1,4 +1,4 @@
-# enforced-table
+# enhanced-table
 
 ## 先安装依赖
 ```
