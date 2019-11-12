@@ -17,7 +17,7 @@ section
     el-table-column(slot='className', label='班级名称', align='center')
       a(slot-scope='{ row }',class="link",href="javascript:;" @click="clickClassName(row)") {{row.className}}
   //- 分页 没有数据的时候不显示
-  .pagination-box
+  .pagination-box(v-if="tableData.length")
     el-pagination(@current-change='changeTablePage', :current-page.sync='otherParams.pageIndex', :page-size='otherParams.pageSize', layout='prev, pager, next, jumper', :total='dataLength')
 </template>
 <script>

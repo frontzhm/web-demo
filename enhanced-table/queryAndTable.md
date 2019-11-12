@@ -1,3 +1,29 @@
+---
+title: 让后台查询和表格这种页面更加快速和简便
+tags: js
+categories: js
+---
+
+做后台项目，很多页面类似下面
+
+![查询页面](https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/query1.png)
+
+这种页面有时候逻辑也是有点麻烦，要是每个页面一遍遍想，就有点尬，所以想了个偷懒的法子，将通用逻辑抽离出来，需要这种页面的时候，只需要适当的配置即可，不用再关心相同的逻辑。
+
+对于表单，需要的方法有：设置表单数据、拿到表单的参数、设置表单项其他的属性等。
+
+对于ajax请求回来的数据，需要的方法：拿到请求需要的参数，此参数分为两块，一个是表单提供的，一个分页和排序这种的，第一次的请求可以保留参数，为重置表单数据或者分页排序值做准备。
+
+主要实现的通用功能：请求数据、查询逻辑、重置逻辑、导出逻辑。
+
+[enhanced-table](https://juejin.im/post/5dc281036fb9a04a9967e817)
+[enhanced-form](https://juejin.im/post/5daeda8f51882554c07586f5)
+
+## query作为mixins的代码
+
+[github地址](https://github.com/frontzhm/web-demo/tree/master/enhanced-table)，运行`node server.js`还有`yarn install;yarn dev`，之后打开[http://localhost:8080/single-query](http://localhost:8080/single-query)即可看到效果
+
+```html
 
 <script>
 /* 此页面最适合 上面是简单的表单，下面是表格，主要是查询 翻页 重置 导出功能
@@ -7,27 +33,6 @@
 3. init里面一般是当前页面具体的初始化，一般需要重写
 4. computed:tableData一般是需要重新写的
 5. 放好html，基本可以玩起来了
-*/
-/**
-<template lang="pug">
-section
-  //- 表单区域
-  enhanced-form.app-query-form(ref="queryForm" :form-config="formConfig" :form-attr="formAttr")
-    template(v-slot:districtName="{config,form}")
-      el-form-item(:label="config.label" prop="districtName")
-        el-select(v-model="form.props.districtName" v-bind="config" @change="changeDistrict(form.props.districtName)")
-          el-option(v-for="item in config.options" :key="item.value" :value="item.value" :label="item.label" )
-    template(#btns)
-      el-form-item.app-btns-box
-        el-button.btn(type='primary', @click='clickSearchBtn') 查询
-        el-button.btn(type='primary', @click='clickResetBtn', plain='') 重置
-        el-button.btn(type='warning',plain='', @click='clickExportBtn') 导出
-  //- 表格区域
-  enhanced-table(:is-load='isShowTableLoading', :table-data='tableData', :col-configs='colConfigs')
-  //- 分页 没有数据的时候不显示
-  .pagination-box(v-if="tableData.length")
-    el-pagination(@current-change='changeTablePage', :current-page.sync='otherParams.pageIndex', :page-size='otherParams.pageSize', layout='prev, pager, next, jumper', :total='dataLength')
-</template>
  */
 import EnhancedTable from '@/components/EnhancedTable'
 import EnhancedForm from '@/components/EnhancedForm'
@@ -183,3 +188,104 @@ export default {
 
 }
 </script>
+
+```
+
+## 引用query的页面
+
+```pug
+<template lang="pug">
+section
+  //- 表单区域
+  enhanced-form.app-query-form(ref="queryForm" :form-config="formConfig" :form-attr="formAttr")
+    template(v-slot:districtName="{config,form}")
+      el-form-item(:label="config.label" prop="districtName")
+        el-select(v-model="form.props.districtName" v-bind="config" @change="changeDistrict(form.props.districtName)")
+          el-option(v-for="item in config.options" :key="item.value" :value="item.value" :label="item.label" )
+    template(#btns)
+      el-form-item.app-btns-box
+        el-button.btn(type='primary', @click='clickSearchBtn') 查询
+        el-button.btn(type='primary', @click='clickResetBtn', plain='') 重置
+        el-button.btn(type='warning',plain='', @click='clickExportBtn') 导出
+  //- 表格区域
+  enhanced-table(:is-load='isShowTableLoading', :table-data='tableData', :col-configs='colConfigs')
+  //- 分页 没有数据的时候不显示
+  .pagination-box(v-if="tableData.length")
+    el-pagination(@current-change='changeTablePage', :current-page.sync='otherParams.pageIndex', :page-size='otherParams.pageSize', layout='prev, pager, next, jumper', :total='dataLength')
+</template>
+<script>
+import Query from '@/mixins/Query'
+
+export default {
+  mixins: [Query],
+  data () {
+    const formConfig = {
+      year: { label: '年份', category: 'date-picker', default: (new Date()).getFullYear() + '', type: 'year', format: 'yyyy', valueFormat: 'yyyy' },
+      term: { label: '季度', category: 'select', options: [{ value: '春', label: '春' }, { value: '夏', label: '夏' }, { value: '秋', label: '秋' }, { value: '冬', label: '冬' }] },
+      area: { label: '大区', category: 'select', filterable: true, default: '', options: null },
+      name: { label: '姓名', category: 'input' },
+      code: { label: '编号', category: 'input' }
+    }
+
+    const colConfigs = [
+      { prop: 'orderNumber', label: '序号', sortable: false, align: 'center' },
+      { slot: 'projectName', prop: 'projectName', label: '教研组', sortable: false, align: 'center' },
+      { prop: 'teacherCount', label: '教师数量', sortable: false, align: 'center' },
+      { prop: 'lessonCount', label: '总课次', sortable: false, align: 'center' },
+      { prop: 'uploadPercent', label: '上传率', sortable: false, align: 'center' },
+      { prop: 'passPercent', label: '合格率', sortable: false, align: 'center' }
+    ]
+    const ajaxApis = {
+      query: 'AjaxQuery',
+      export: 'AjaxExport'
+    }
+    return {
+      // 查询表单项的配置
+      formConfig,
+      // 表格每列的配置
+      colConfigs,
+      // 这个是 请求的方法，不同页面的请求方法名肯定是不一样的 需要配置
+      ajaxApis
+    }
+  },
+  computed: {
+    // 处理之后的数据
+    tableData () {
+      return this.tableDataNative
+    }
+  },
+  methods: {
+    // 页面加载执行的方法
+    async init () {
+      // 这个有异步操作，需要用await
+      await this.setAreaOptions()
+      this.getTableData()
+    },
+    async setAreaOptions () {
+      let res = await this.$api.AjaxGetAreas()
+      let options = res.data.data
+      this.setSingleFormItem({ prop: 'area', attr: 'options', value: options })
+      this.setSingleFormItem({ prop: 'area', attr: 'default', value: options[1].value })
+    }
+  }
+
+}
+</script>
+<style>
+.el-table{
+  border:1px solid #e8e8e8;
+  width: 90%;
+  margin: auto;
+}
+.pagination-box{
+  margin-top: 20px;
+  text-align: center;
+}
+
+</style>
+
+```
+
+## 不足
+
+水平有限，即便这样还是有点麻烦，嗯，继续加油

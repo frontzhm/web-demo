@@ -18,6 +18,9 @@ yarn run serve
 yarn run build
 ```
 
+运行`node server.js`之后打开
+[http://localhost:8080/single-query](http://localhost:8080/single-query)即可看到效果
+
 ### Customize configuration
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
