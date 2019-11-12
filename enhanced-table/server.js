@@ -23,11 +23,13 @@ app.post('/query', (req, res) => {
   console.log(req.body)
   let { pageIndex, pageSize } = req.body
   let splitData = data.data.slice((pageIndex - 1) * pageSize, pageIndex * pageSize)
-  res.json({
-    state: '1',
-    data: splitData,
-    dataCount: data.data.length
-  })
+  setTimeout(() => {
+    res.json({
+      state: '1',
+      data: splitData,
+      dataCount: data.data.length
+    })
+  }, 1000)
 })
 app.post('/getAreas', (req, res) => {
   let data = [{ value: 1, label: '东南区' }, { value: 2, label: '西南区' }]
