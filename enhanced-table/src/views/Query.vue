@@ -10,15 +10,15 @@ section
       el-form-item.app-btns-box
         el-button.btn(type='primary', @click='clickSearchBtn') 查询
         el-button.btn(type='primary', @click='clickResetBtn', plain='') 重置
-        el-button.btn(type='warning',plain='', @click='clickExportBtn("AjaxExportClassAssistantEvaluateList")') 导出
+        el-button.btn(type='warning',plain='', @click='clickExportBtn') 导出
   //- 表格区域
   enhanced-table(:is-load='isShowTableLoading', :table-data='tableData', :col-configs='colConfigs')
     //- 跳转链接 这边注意需要在tableKeys那边加slot
     el-table-column(slot='className', label='班级名称', align='center')
       a(slot-scope='{ row }',class="link",href="javascript:;" @click="clickClassName(row)") {{row.className}}
   //- 分页 没有数据的时候不显示
-  .pagination-box(v-if='isShowPage')
-    el-pagination(@current-change='changeTablePage', :current-page.sync='pageIndex', :page-size='pageSize', layout='prev, pager, next, jumper', :total='tableDataSumCount')
+  .pagination-box
+    el-pagination(@current-change='changeTablePage', :current-page.sync='pageIndex', :page-size='pageSize', layout='prev, pager, next, jumper', :total='dataLength')
 </template>
 <script>
 import EnhancedTable from '@/components/EnhancedTable'
@@ -29,7 +29,7 @@ export default {
 
   data () {
     const formConfig = {
-      year: { label: '年份', category: 'date-picker', type: 'year', format: 'yyyy', valueFormat: 'yyyy', clearable: false },
+      year: { label: '年份', category: 'date-picker', default: (new Date()).getFullYear() + '', type: 'year', format: 'yyyy', valueFormat: 'yyyy' },
       term: { label: '季度', category: 'select', options: [{ value: '春', label: '春' }, { value: '夏', label: '夏' }, { value: '秋', label: '秋' }, { value: '冬', label: '冬' }] },
       area: { label: '大区', category: 'select', filterable: true, default: '', options: null },
       name: { label: '姓名', category: 'input' },
@@ -43,8 +43,9 @@ export default {
       // label右对齐
       labelPosition: 'right'
     }
+
     const colConfigs = [
-      { prop: 'index', label: '序号', sortable: false, align: 'center' },
+      { prop: 'orderNumber', label: '序号', sortable: false, align: 'center' },
       { slot: 'projectName', prop: 'projectName', label: '教研组', sortable: false, align: 'center' },
       { prop: 'teacherCount', label: '教师数量', sortable: false, align: 'center' },
       { prop: 'lessonCount', label: '总课次', sortable: false, align: 'center' },
@@ -61,11 +62,122 @@ export default {
       colConfigs,
       // 表格的加载图标
       isShowTableLoading: false,
-      // 表格数据
-      tableData: []
+      // 表格请求的原始数据
+      tableDataNative: [],
+      // 有数据就意味着可能分页
+      pageIndex: 0,
+      pageSize: 10,
+      dataLength: 0,
+      // 为了方便重置，将首次请求表格数据的参数保存
+      initialParams: null
 
     }
+  },
+  computed: {
+    // 根据表单的配置，拿到默认值的对象，供defaultAjaxParams使用
+    defaultFormParams () {
+      let defaultFormParams = {}
+      Object.keys(this.formConfig).forEach(prop => {
+      // 这里如果设置了默认项就是默认值，没有就是undefined
+        defaultFormParams[prop] = this.formConfig[prop].default
+      })
+      return defaultFormParams
+    },
+    defaultAjaxParams () {
+      let res = {
+        pageIndex: 1,
+        pageSize: this.pageSize,
+        isAsc: '',
+        sortBy: '',
+        ...this.defaultFormParams
+      }
+      return res
+    },
+    // 处理之后的数据
+    tableData () {
+      return this.tableDataNative
+    }
+  },
+  mounted () {
+    this.init()
+  },
+  methods: {
+    // 页面加载执行的方法
+    init () {
+      console.log(this.getFormData())
+      this.getTableData()
+    },
+    clickSearchBtn () {
+      this.getTableData()
+    },
+    clickExportBtn () {
+      // 导出的参数和查询的参数基本一样，但是数据不分页
+      let params = { ...this.getAjaxQueryParams() }
+      params.pageSize = 0
+      this.$api.AjaxExportTable(params)
+    },
+    clickResetBtn () {
+      // 重置表单
+      this.setFormData(this.defaultFormParams)
+      // 查询初始参数
+      this.getTableData(this.initialParams)
+    },
+    // ajax请求表格数据，并赋值，因为后端的数据很多时候前端需要处理下，在computed那边加一层过滤
+    async ajaxQuery (params) {
+      let res = await this.$api.AjaxQuery(params)
+      this.tableDataNative = res.data.data
+      this.dataLength = res.data.dataCount
+    },
+
+    // 将表单元素设置成特定的值
+    setFormData (refForm = 'queryForm', params) {
+      // 表单
+      for (let key in params) {
+        this.$refs[refForm].$data.form.props[key] = params[key]
+      }
+    },
+    getFormData (refForm = 'queryForm') {
+      return this.$refs[refForm].$data.form.props
+    },
+    // 设置单个表单元素的属性，常用的是options
+    setSingleFormItem (formConfig = 'formConfig', prop, value) {
+      this[formConfig][prop] = value
+    },
+    getTableData () {
+      let params = this.getAjaxQueryParams()
+      this.ajaxQuery(params)
+    },
+    getAjaxQueryParams () {
+      let params = {}
+      let pageKeys = ['pageIndex', 'pageSize', 'sortBy', 'isAsc']
+      // 翻页的一些参数
+      pageKeys.forEach(key => {
+        params[key] = this[key]
+      })
+      // 这里加上表单的数据，当然可能还有别的
+      params = { ...params, ...this.getFormData() }
+      // 设置首次查询的参数
+      this.initialParams = this.initialParams || params
+      return params
+    },
+    changeTablePage (page) {
+      this.pageIndex = page
+      this.getTableData()
+    }
+
   }
 
 }
 </script>
+<style>
+.el-table{
+  border:1px solid #e8e8e8;
+  width: 90%;
+  margin: auto;
+}
+.pagination-box{
+  margin-top: 20px;
+  text-align: center;
+}
+
+</style>
