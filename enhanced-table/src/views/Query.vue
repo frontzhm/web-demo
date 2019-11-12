@@ -90,6 +90,8 @@ export default {
   methods: {
     // 页面加载执行的方法
     async init () {
+      // 这个有异步操作，需要用await
+      await this.setAreaOptions()
       this.getTableData()
     },
     async setAreaOptions () {
@@ -129,6 +131,7 @@ export default {
         this.$refs[refForm].$data.form.props[key] = params[key]
       }
     },
+    // 得到表单各项的值
     getFormData (refForm = 'queryForm') {
       return this.$refs[refForm].$data.form.props
     },
@@ -148,9 +151,7 @@ export default {
     getAjaxQueryParams () {
       let formParams = this.getFormData()
       let params = { ...this.otherParams, ...formParams }
-      // 设置首次查询的参数
-      console.log({ params })
-      // this.initialParams = this.initialParams || { formParams, otherParams: this.otherParams }
+      // 设置首次查询的参数,这里注意对象是引用，必须深度复制下
       this.initialParams || (this.initialParams = { formParams: { ...formParams }, otherParams: { ...this.otherParams } })
       console.log(this.initialParams)
       return params
