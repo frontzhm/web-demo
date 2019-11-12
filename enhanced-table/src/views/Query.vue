@@ -18,7 +18,7 @@ section
       a(slot-scope='{ row }',class="link",href="javascript:;" @click="clickClassName(row)") {{row.className}}
   //- 分页 没有数据的时候不显示
   .pagination-box
-    el-pagination(@current-change='changeTablePage', :current-page.sync='pageIndex', :page-size='pageSize', layout='prev, pager, next, jumper', :total='dataLength')
+    el-pagination(@current-change='changeTablePage', :current-page.sync='otherParams.pageIndex', :page-size='otherParams.pageSize', layout='prev, pager, next, jumper', :total='dataLength')
 </template>
 <script>
 import EnhancedTable from '@/components/EnhancedTable'
@@ -65,8 +65,13 @@ export default {
       // 表格请求的原始数据
       tableDataNative: [],
       // 有数据就意味着可能分页
-      pageIndex: 0,
-      pageSize: 10,
+      otherParams: {
+        pageIndex: 0,
+        pageSize: 10,
+        isAsc: '',
+        sortBy: ''
+      },
+      // 数据总长度，基本只给分页组件用的
       dataLength: 0,
       // 为了方便重置，将首次请求表格数据的参数保存
       initialParams: null
@@ -74,25 +79,6 @@ export default {
     }
   },
   computed: {
-    // 根据表单的配置，拿到默认值的对象，供defaultAjaxParams使用
-    defaultFormParams () {
-      let defaultFormParams = {}
-      Object.keys(this.formConfig).forEach(prop => {
-      // 这里如果设置了默认项就是默认值，没有就是undefined
-        defaultFormParams[prop] = this.formConfig[prop].default
-      })
-      return defaultFormParams
-    },
-    defaultAjaxParams () {
-      let res = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        isAsc: '',
-        sortBy: '',
-        ...this.defaultFormParams
-      }
-      return res
-    },
     // 处理之后的数据
     tableData () {
       return this.tableDataNative
@@ -103,9 +89,14 @@ export default {
   },
   methods: {
     // 页面加载执行的方法
-    init () {
-      console.log(this.getFormData())
+    async init () {
       this.getTableData()
+    },
+    async setAreaOptions () {
+      let res = await this.$api.AjaxGetAreas()
+      let options = res.data.data
+      this.setSingleFormItem({ prop: 'area', attr: 'options', value: options })
+      this.setSingleFormItem({ prop: 'area', attr: 'default', value: options[1].value })
     },
     clickSearchBtn () {
       this.getTableData()
@@ -118,9 +109,11 @@ export default {
     },
     clickResetBtn () {
       // 重置表单
-      this.setFormData(this.defaultFormParams)
-      // 查询初始参数
-      this.getTableData(this.initialParams)
+      this.setFormData(this.initialParams.formParams)
+      // 重置页数的相关参数
+      this.otherParams = this.initialParams.otherParams
+      // 查询
+      this.getTableData()
     },
     // ajax请求表格数据，并赋值，因为后端的数据很多时候前端需要处理下，在computed那边加一层过滤
     async ajaxQuery (params) {
@@ -129,8 +122,8 @@ export default {
       this.dataLength = res.data.dataCount
     },
 
-    // 将表单元素设置成特定的值
-    setFormData (refForm = 'queryForm', params) {
+    // 将表单元素设置成特定的值,params  = {year:2019,...}
+    setFormData (params, refForm = 'queryForm') {
       // 表单
       for (let key in params) {
         this.$refs[refForm].$data.form.props[key] = params[key]
@@ -139,29 +132,31 @@ export default {
     getFormData (refForm = 'queryForm') {
       return this.$refs[refForm].$data.form.props
     },
-    // 设置单个表单元素的属性，常用的是options
-    setSingleFormItem (formConfig = 'formConfig', prop, value) {
-      this[formConfig][prop] = value
+    // 设置单个表单元素的属性，除了默认值，常用的是options
+    setSingleFormItem ({ prop, attr, value, formConfig = 'formConfig', refForm = 'queryForm' }) {
+      this[formConfig][prop][attr] = value
+      // 默认值的话 需要变动form的属性
+      if (attr === 'default') {
+        this.$refs[refForm].$data.form.props[prop] = value
+      }
     },
     getTableData () {
       let params = this.getAjaxQueryParams()
       this.ajaxQuery(params)
     },
+    // 请求的参数 包括表单和页数相关的数据
     getAjaxQueryParams () {
-      let params = {}
-      let pageKeys = ['pageIndex', 'pageSize', 'sortBy', 'isAsc']
-      // 翻页的一些参数
-      pageKeys.forEach(key => {
-        params[key] = this[key]
-      })
-      // 这里加上表单的数据，当然可能还有别的
-      params = { ...params, ...this.getFormData() }
+      let formParams = this.getFormData()
+      let params = { ...this.otherParams, ...formParams }
       // 设置首次查询的参数
-      this.initialParams = this.initialParams || params
+      console.log({ params })
+      // this.initialParams = this.initialParams || { formParams, otherParams: this.otherParams }
+      this.initialParams || (this.initialParams = { formParams: { ...formParams }, otherParams: { ...this.otherParams } })
+      console.log(this.initialParams)
       return params
     },
     changeTablePage (page) {
-      this.pageIndex = page
+      this.otherParams.pageIndex = page
       this.getTableData()
     }
 

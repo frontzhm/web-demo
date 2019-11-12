@@ -29,3 +29,11 @@ app.post('/query', (req, res) => {
     dataCount: data.data.length
   })
 })
+app.post('/getAreas', (req, res) => {
+  let data = [{ value: 1, label: '东南区' }, { value: 2, label: '西南区' }]
+  res.json({
+    state: '1',
+    data,
+    dataCount: data.length
+  })
+})
