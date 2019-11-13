@@ -79,7 +79,7 @@ export default {
       tableDataNative: [],
       // 有数据就意味着可能分页
       otherParams: {
-        pageIndex: 0,
+        pageIndex: 1,
         pageSize: 10,
         isAsc: '',
         sortBy: ''
@@ -105,7 +105,13 @@ export default {
     async init () {
       // 这个有异步操作，需要用await
       await this.setAreaOptions()
+      this.setInitialParams()
       this.getTableData()
+    },
+    setInitialParams () {
+      let formParams = this.getFormData()
+      // 设置首次查询的参数,这里注意对象是引用，必须深度复制下
+      this.initialParams = { formParams: { ...formParams }, otherParams: { ...this.otherParams } }
     },
     async setAreaOptions () {
       let res = await this.$api.AjaxGetAreas()
@@ -169,9 +175,6 @@ export default {
     getAjaxQueryParams () {
       let formParams = this.getFormData()
       let params = { ...this.otherParams, ...formParams }
-      // 设置首次查询的参数,这里注意对象是引用，必须深度复制下
-      this.initialParams || (this.initialParams = { formParams: { ...formParams }, otherParams: { ...this.otherParams } })
-      console.log(this.initialParams)
       return params
     },
     // 改变页数

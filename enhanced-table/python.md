@@ -4,7 +4,7 @@ tags: python
 categories: python
 ---
 
-mac本终端输入`idle`，会打开一个软件，然后输入以下，每行输入之后换行，fred可以forward、back、left 和 right。想象一只小乌龟走的路就是画。
+mac本终端输入`idle`，会打开一个软件，然后新建一个`xx.py`输入以下，然后f5，就能看到图像
 
 ```python
 import turtle
@@ -63,6 +63,10 @@ for num in number:
 注释里面的，打开现在的注释，![x](https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/python9.png)
 
 ![turtle](https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/turtle.png)
+
+## range
+
+range(3)会产生`[0,1,2]`的数组。
 
 ## 趣闻
 

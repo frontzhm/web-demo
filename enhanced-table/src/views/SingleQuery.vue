@@ -66,6 +66,7 @@ export default {
     async init () {
       // 这个有异步操作，需要用await
       await this.setAreaOptions()
+      this.setInitialParams()
       this.getTableData()
     },
     async setAreaOptions () {
