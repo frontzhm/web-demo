@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        html,body,ol,li{
+padding: 0;
+margin: 0;
+        }
+        ol{
+            list-style: none;
+        }
+        #app{
+            padding: 20px;
+        }
+        h2{
+            background-color: #eee;
+            font-size: 16px;
+            height: 32px;
+            line-height: 32px;
+            padding-left: 10px;
+        }
+        a{
+            color: #369;
+            text-decoration: none;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <ol>
+        <li v-for='charter in charters'>
+          <h2>{{charter.title}}</h2>
+          <ol>
+            <li v-for='article in charter.children'><a :href="article.href">{{article.title}}</a></li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+    <script>
+      let charters = [
+        "1.喂养的基本知识",
+        "2.新生儿常见问题",
+        "3.家庭护理常识",
+        "4.宝宝接种疫苗那些事",
+        "5.儿保那些事",
+        "6.医疗通识",
+        "7.宝宝皮肤问题的处理和用药",
+        "8.宝宝耳鼻喉问题的处理及用药",
+        "9.婴幼儿发热问题的处理和用药",
+        "10.宝宝腹泻问题的处理及用药",
+        "11.宝宝便秘问题的处理及用药",
+        "12.宝宝咳嗽、喘息问题的处理及用药",
+        "13.宝宝常见感染性疾病",
+        "14.宝宝口腔常见问题",
+        "15.外伤急救和户外活动"
+      ];
+      
+      // {title:'喂养的基本知识',children:[{title:'xx',href:''}]}
+      let articles = [
+        "1_1.哺乳期怎么吃.pdf",
+        "1_2.哺乳期抗生素的正确使用.pdf",
+        "1_3.宝宝常见的喝奶问题如何解决.pdf",
+        "1_4.正确人工喂养.pdf",
+        "1_5.正确母乳喂养.pdf",
+        "1_6.正确添加辅食.pdf",
+        "1_7.认识乳腺炎.pdf",
+        "2_1.新生儿常见正常现象.pdf",
+        "2_2.正确应对肠绞痛.pdf",
+        "2_3.正确认识新生儿黄疸.pdf",
+        "2_4.给宝宝正确的生活护理.pdf",
+        "3_1.如何准备家庭药箱.pdf",
+        "4_1.与疫苗有关的简单免疫学知识.pdf",
+        "4_2.正确接种流感疫苗.pdf",
+        "4_3.正确认识疫苗.pdf",
+        "4_4.认识HPV疫苗.pdf",
+        "4_5.认识乙肝疫苗.pdf",
+        "5_1.0-1岁宝宝的陪玩指南.pdf",
+        "5_10.髋关节发育不良的防治.pdf",
+        "5_2.12种不是缺钙的情形.pdf",
+        "5_3.如何正确补充维生素D.pdf",
+        "5_4.孩子没爬过，有问题吗.pdf",
+        "5_5.正确给孩子增高.pdf",
+        "5_6.认识ASQ问卷.pdf",
+        "5_7.认识O型腿.pdf",
+        "5_8.认识宝宝的语言发育.pdf",
+        "5_9.认识高质量儿保.pdf",
+        "6_1.尿常规的基础知识.pdf",
+        "6_2.解读血常规.pdf",
+        "6_3.识别靠谱的医疗.pdf",
+        "7_1.新生儿10种常见皮肤问题.pdf",
+        "7_2.正确应对倒刺.pdf",
+        "7_3.正确应对湿疹.pdf",
+        "7_4.正确防止尿布疹.pdf",
+        "7_5.激素的发现及应用.pdf",
+        "8_1.变应性鼻炎的生活护理.pdf",
+        "8_2.引起儿童声嘶的常见疾病.pdf",
+        "8_3.正确使用滴耳液.pdf",
+        "8_4.正确应对儿童鼻出血.pdf",
+        "8_5.正确应对流鼻涕.pdf",
+        "8_6.腺样体肥大的诊断和处理.pdf",
+        "9_1.婴幼儿发热问题的处理和用药.pdf",
+        "10_1.正确应对小儿腹泻.pdf",
+        "11_1正确应对便秘.pdf",
+        "12_1.认识咳嗽.pdf",
+        "12_2.认识喘息.pdf",
+        "12_3.认识抗组胺药的研究发展史.pdf",
+        "12_4.认识毛细支气管炎.pdf",
+        "13_1.手足口病的家庭护理及预防.pdf",
+        "13_2.正确使用抗生素.pdf",
+        "13_3.正确应对幼儿急诊.pdf",
+        "13_4.正确应对水痘.pdf",
+        "13_5.正确应对猩红热.pdf",
+        "13_6.正确应对鹅口疮.pdf",
+        "14_1.宝宝牙齿清洁及护理.pdf",
+        "14_2.宝宝常见口腔问题：口臭和磨牙.pdf",
+        "15_1.如何选择消毒剂.pdf",
+        "15_2.孩子应该几岁开始游泳？.pdf",
+        "15_3.正确应对中暑.pdf",
+        "15_4.正确应对擦伤.pdf",
+        "15_5.正确应对溺水.pdf",
+        "15_6.正确应对烧伤.pdf",
+        "15_7.正确预防和应对蚊虫叮咬.pdf"
+      ];
+      let structures = charters.map((charter,index)=>{
+          let curCharterNumber = index+1
+          let commonPath =
+        "https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/";
+          let articlesOfCurCharter = articles.filter(article=>article.split('_')[0]-0===curCharterNumber)
+          let getArticleTitle = title => title.split('.')[1]
+          let articlesAndHrefsOfCurCharter = articlesOfCurCharter.map(article=>({title:getArticleTitle(article),href:`${commonPath}${article}`}))
+          let res = {title:charter,children:articlesAndHrefsOfCurCharter}
+          return res
+      })
+    //   structures打开之后的样子，这是最后想要的数据
+      let structuresJson = [{"title":"1.喂养的基本知识","children":[{"title":"哺乳期怎么吃","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_1.哺乳期怎么吃.pdf"},{"title":"哺乳期抗生素的正确使用","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_2.哺乳期抗生素的正确使用.pdf"},{"title":"宝宝常见的喝奶问题如何解决","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_3.宝宝常见的喝奶问题如何解决.pdf"},{"title":"正确人工喂养","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_4.正确人工喂养.pdf"},{"title":"正确母乳喂养","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_5.正确母乳喂养.pdf"},{"title":"正确添加辅食","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_6.正确添加辅食.pdf"},{"title":"认识乳腺炎","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/1_7.认识乳腺炎.pdf"}]},{"title":"2.新生儿常见问题","children":[{"title":"新生儿常见正常现象","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/2_1.新生儿常见正常现象.pdf"},{"title":"正确应对肠绞痛","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/2_2.正确应对肠绞痛.pdf"},{"title":"正确认识新生儿黄疸","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/2_3.正确认识新生儿黄疸.pdf"},{"title":"给宝宝正确的生活护理","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/2_4.给宝宝正确的生活护理.pdf"}]},{"title":"3.家庭护理常识","children":[{"title":"如何准备家庭药箱","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/3_1.如何准备家庭药箱.pdf"}]},{"title":"4.宝宝接种疫苗那些事","children":[{"title":"与疫苗有关的简单免疫学知识","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/4_1.与疫苗有关的简单免疫学知识.pdf"},{"title":"正确接种流感疫苗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/4_2.正确接种流感疫苗.pdf"},{"title":"正确认识疫苗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/4_3.正确认识疫苗.pdf"},{"title":"认识HPV疫苗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/4_4.认识HPV疫苗.pdf"},{"title":"认识乙肝疫苗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/4_5.认识乙肝疫苗.pdf"}]},{"title":"5.儿保那些事","children":[{"title":"0-1岁宝宝的陪玩指南","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_1.0-1岁宝宝的陪玩指南.pdf"},{"title":"髋关节发育不良的防治","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_10.髋关节发育不良的防治.pdf"},{"title":"12种不是缺钙的情形","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_2.12种不是缺钙的情形.pdf"},{"title":"如何正确补充维生素D","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_3.如何正确补充维生素D.pdf"},{"title":"孩子没爬过，有问题吗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_4.孩子没爬过，有问题吗.pdf"},{"title":"正确给孩子增高","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_5.正确给孩子增高.pdf"},{"title":"认识ASQ问卷","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_6.认识ASQ问卷.pdf"},{"title":"认识O型腿","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_7.认识O型腿.pdf"},{"title":"认识宝宝的语言发育","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_8.认识宝宝的语言发育.pdf"},{"title":"认识高质量儿保","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/5_9.认识高质量儿保.pdf"}]},{"title":"6.医疗通识","children":[{"title":"尿常规的基础知识","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/6_1.尿常规的基础知识.pdf"},{"title":"解读血常规","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/6_2.解读血常规.pdf"},{"title":"识别靠谱的医疗","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/6_3.识别靠谱的医疗.pdf"}]},{"title":"7.宝宝皮肤问题的处理和用药","children":[{"title":"新生儿10种常见皮肤问题","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/7_1.新生儿10种常见皮肤问题.pdf"},{"title":"正确应对倒刺","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/7_2.正确应对倒刺.pdf"},{"title":"正确应对湿疹","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/7_3.正确应对湿疹.pdf"},{"title":"正确防止尿布疹","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/7_4.正确防止尿布疹.pdf"},{"title":"激素的发现及应用","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/7_5.激素的发现及应用.pdf"}]},{"title":"8.宝宝耳鼻喉问题的处理及用药","children":[{"title":"变应性鼻炎的生活护理","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_1.变应性鼻炎的生活护理.pdf"},{"title":"引起儿童声嘶的常见疾病","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_2.引起儿童声嘶的常见疾病.pdf"},{"title":"正确使用滴耳液","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_3.正确使用滴耳液.pdf"},{"title":"正确应对儿童鼻出血","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_4.正确应对儿童鼻出血.pdf"},{"title":"正确应对流鼻涕","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_5.正确应对流鼻涕.pdf"},{"title":"腺样体肥大的诊断和处理","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/8_6.腺样体肥大的诊断和处理.pdf"}]},{"title":"9.婴幼儿发热问题的处理和用药","children":[{"title":"婴幼儿发热问题的处理和用药","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/9_1.婴幼儿发热问题的处理和用药.pdf"}]},{"title":"10.宝宝腹泻问题的处理及用药","children":[{"title":"正确应对小儿腹泻","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/10_1.正确应对小儿腹泻.pdf"}]},{"title":"11.宝宝便秘问题的处理及用药","children":[{"title":"pdf","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/11_1正确应对便秘.pdf"}]},{"title":"12.宝宝咳嗽、喘息问题的处理及用药","children":[{"title":"认识咳嗽","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/12_1.认识咳嗽.pdf"},{"title":"认识喘息","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/12_2.认识喘息.pdf"},{"title":"认识抗组胺药的研究发展史","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/12_3.认识抗组胺药的研究发展史.pdf"},{"title":"认识毛细支气管炎","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/12_4.认识毛细支气管炎.pdf"}]},{"title":"13.宝宝常见感染性疾病","children":[{"title":"手足口病的家庭护理及预防","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_1.手足口病的家庭护理及预防.pdf"},{"title":"正确使用抗生素","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_2.正确使用抗生素.pdf"},{"title":"正确应对幼儿急诊","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_3.正确应对幼儿急诊.pdf"},{"title":"正确应对水痘","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_4.正确应对水痘.pdf"},{"title":"正确应对猩红热","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_5.正确应对猩红热.pdf"},{"title":"正确应对鹅口疮","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/13_6.正确应对鹅口疮.pdf"}]},{"title":"14.宝宝口腔常见问题","children":[{"title":"宝宝牙齿清洁及护理","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/14_1.宝宝牙齿清洁及护理.pdf"},{"title":"宝宝常见口腔问题：口臭和磨牙","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/14_2.宝宝常见口腔问题：口臭和磨牙.pdf"}]},{"title":"15.外伤急救和户外活动","children":[{"title":"如何选择消毒剂","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_1.如何选择消毒剂.pdf"},{"title":"孩子应该几岁开始游泳？","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_2.孩子应该几岁开始游泳？.pdf"},{"title":"正确应对中暑","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_3.正确应对中暑.pdf"},{"title":"正确应对擦伤","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_4.正确应对擦伤.pdf"},{"title":"正确应对溺水","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_5.正确应对溺水.pdf"},{"title":"正确应对烧伤","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_6.正确应对烧伤.pdf"},{"title":"正确预防和应对蚊虫叮咬","href":"https://blog-huahua.oss-cn-beijing.aliyuncs.com/blog/code/15_7.正确预防和应对蚊虫叮咬.pdf"}]}]
+      console.log(structures)
+      console.log(JSON.stringify(structures) )
+      let vm = new Vue({
+        el: "#app",
+        data: {
+            charters: structuresJson
+        }
+      });
+    </script>
+  </body>
+</html>
